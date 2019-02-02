@@ -37,7 +37,7 @@ def test_audiofile(filename=None, type='sin440', duration=1):
     elif type == 'silence':
         samples = [0] * int(44100 * duration)
     else:
-        raise (ValueError, 'Wrong audio type:', type)
+        raise ValueError
     
     if not filename:
         tf = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
