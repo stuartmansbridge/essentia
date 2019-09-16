@@ -17,7 +17,7 @@
  * version 3 along with this program.  If not, see http://www.gnu.org/licenses/
  */
 
-#include "essentiamath.h" // for silenceCutoff
+#include "essentiamath.h" // for SILENCE_CUTOFF
 #include "streamingalgorithm.h"
 #include "poolstorage.h" // connecting pools
 #include "../algorithms/io/fileoutputproxy.h" // connecting FileOutput algorithm
@@ -238,8 +238,8 @@ is_silent(PyObject* self, PyObject* arg) {
 
   double p = internal_instant_power(arg);
 
-  if (p < silenceCutoff) Py_RETURN_TRUE;
-  else                   Py_RETURN_FALSE;
+  if (p < SILENCE_CUTOFF) Py_RETURN_TRUE;
+  else                    Py_RETURN_FALSE;
 }
 
 static PyObject*
@@ -329,6 +329,17 @@ ampToDb(PyObject* notUsed, PyObject* arg) {
   }
 
   Real db = amp2db( Real( PyFloat_AS_DOUBLE(arg) ) );
+  return PyFloat_FromDouble( double(db) );
+}
+
+static PyObject*
+linToLog(PyObject* notUsed, PyObject* arg) {
+  if (!PyFloat_Check(arg)) {
+    PyErr_SetString(PyExc_TypeError, (char*)"argument must be a float");
+    return NULL;
+  }
+
+  Real db = lin2log( Real( PyFloat_AS_DOUBLE(arg) ) );
   return PyFloat_FromDouble( double(db) );
 }
 
@@ -995,6 +1006,7 @@ static PyMethodDef Essentia__Methods[] = {
   { "db2pow",        dbToPow,          METH_O, "Converts a dB measure of power to a linear measure" },
   { "pow2db",        powToDb,          METH_O, "Converts a linear measure of power to a measure in dB" },
   { "db2amp",        dbToAmp,          METH_O, "Converts a dB measure of amplitude to a linear measure" },
+  { "lin2log",       linToLog,         METH_O, "Converts a linear measure to a logarithmic one" },
   { "amp2db",        ampToDb,          METH_O, "Converts a linear measure of amplitude to a measure in dB" },
   { "equivalentKey", getEquivalentKey, METH_O, "Returns an equivalent key name if exist or itself otherwise. An empty string is returned if the input is not a valid string" },
   { "info",          standard_info,  METH_VARARGS, "returns all the information about a given classic algorithm." },
